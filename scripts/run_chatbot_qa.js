@@ -86,29 +86,53 @@ async function main() {
 }
 
 async function openChat(page) {
-  const input = page.locator('#c_input');
-  if (!(await input.isVisible())) {
-    await page.locator('a.chatbot').click({ timeout: 10000 });
+  const legacyInput = page.locator('#c_input');
+  const currentInput = page.locator('#inputText');
+
+  if (await legacyInput.isVisible()) return;
+  if (await currentInput.isVisible()) return;
+
+  const currentButton = page.locator('.chat-bot-btn');
+  if (await currentButton.isVisible()) {
+    await currentButton.click({ timeout: 10000 });
+    await currentInput.waitFor({ state: 'visible', timeout: 10000 });
+    return;
   }
-  await input.waitFor({ state: 'visible', timeout: 10000 });
+
+  await page.locator('a.chatbot').click({ timeout: 10000 });
+  await legacyInput.waitFor({ state: 'visible', timeout: 10000 });
 }
 
 async function ask(page, item, timeoutMs) {
   const startedAt = new Date();
-  const before = await page.locator('.chat_cont .cc_item').count();
-  await page.locator('#c_input').fill(item.generated_question);
-  await page.keyboard.press('Enter');
+  let answer = '';
 
-  await page.waitForFunction(
-    (count) => document.querySelectorAll('.chat_cont .cc_item').length >= count + 2,
-    before,
-    { timeout: timeoutMs },
-  );
+  if (await page.locator('#inputText').isVisible()) {
+    const before = await page.locator('#chatContainer .qna-bx.chat-bot').count();
+    await page.locator('#inputText').fill(item.generated_question);
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(
+      (count) => document.querySelectorAll('#chatContainer .qna-bx.chat-bot').length > count,
+      before,
+      { timeout: timeoutMs },
+    );
+    answer = await page.locator('#chatContainer .qna-bx.chat-bot').last().innerText({ timeout: 5000 });
+  } else {
+    const before = await page.locator('.chat_cont .cc_item').count();
+    await page.locator('#c_input').fill(item.generated_question);
+    await page.keyboard.press('Enter');
 
-  const answer = await page
-    .locator('.chat_cont .cc_item:not(.you) .c_item')
-    .last()
-    .innerText({ timeout: 5000 });
+    await page.waitForFunction(
+      (count) => document.querySelectorAll('.chat_cont .cc_item').length >= count + 2,
+      before,
+      { timeout: timeoutMs },
+    );
+
+    answer = await page
+      .locator('.chat_cont .cc_item:not(.you) .c_item')
+      .last()
+      .innerText({ timeout: 5000 });
+  }
 
   const score = similarity(item.expected_answer, answer);
   return {
