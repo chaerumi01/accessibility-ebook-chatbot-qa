@@ -49,6 +49,25 @@ async function main() {
     requestBody: { valueInputOption: 'RAW', data: updates },
   });
   console.log(`updated answers: ${updates.length}`);
+
+  const verified = await verifyAnswers(sheets, target, answerByQuestion);
+  console.log(`verified answers: ${verified}/${answerByQuestion.size}`);
+  if (verified !== answerByQuestion.size) {
+    throw new Error('Google 시트에 기록된 답변 일부가 로컬 결과와 일치하지 않습니다.');
+  }
+}
+
+async function verifyAnswers(sheets, target, answerByQuestion) {
+  const firstRow = Math.min(...target.matches.map((match) => match.rowNumber));
+  const lastRow = Math.max(...target.matches.map((match) => match.rowNumber));
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: target.spreadsheetId,
+    range: `${quoteSheetName(target.sheetName)}!C${firstRow}:D${lastRow}`,
+  });
+  return (response.data.values || []).filter(([question, answer]) => {
+    const key = String(question || '').trim();
+    return answerByQuestion.has(key) && String(answer || '') === answerByQuestion.get(key);
+  }).length;
 }
 
 async function discoverTarget(auth, sheets, requestedSheetName, answerByQuestion) {
