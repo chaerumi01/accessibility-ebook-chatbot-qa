@@ -11,8 +11,7 @@
     "report": "node scripts/make_report.js",
     "sheets:dry-run": "node scripts/upload_google_sheet.js --dry-run",
     "sheets:upload": "node scripts/upload_google_sheet.js",
-    "logs:push": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync_github_logs.ps1",
-    "logs:install-task": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_log_sync_task.ps1"
+    "logs:push": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync_github_logs.ps1"
   },
   "keywords": [],
   "author": "",

@@ -81,15 +81,7 @@ npm run sheets:upload
 npm run logs:push
 ```
 
-`run_full.ps1`로 전체 QA를 실행하면 마지막에 자동으로 로그 업로드를 시도합니다. GitHub 원격 저장소가 아직 연결되지 않은 경우에는 로컬 커밋까지만 만들고 업로드는 건너뜁니다.
-
-주기적으로 자동 업로드하려면 Windows 예약 작업을 설치합니다.
-
-```powershell
-npm run logs:install-task
-```
-
-기본값은 10분마다 변경사항을 확인해 커밋/푸시합니다. 먼저 GitHub 원격 저장소를 연결해야 실제 업로드까지 진행됩니다.
+GitHub 로그 업로드는 자동 실행하지 않습니다. 필요한 시점에 `npm run logs:push`를 직접 실행합니다.
 
 시트에 쓰기 전에 `B:D`에 들어갈 값을 미리 확인하려면 다음처럼 실행합니다.
 
