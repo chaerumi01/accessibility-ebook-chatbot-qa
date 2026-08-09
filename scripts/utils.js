@@ -5,7 +5,7 @@ const XLSX = require('xlsx');
 const ROOT = path.resolve(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'data');
 const DEFAULT_DB_PATH = 'C:/Users/seocy/Downloads/(25)QA3000_데이터베이스.xlsx';
-const DEFAULT_URL = 'https://www.nld.go.kr/eac/cert.do';
+const DEFAULT_URL = 'https://nld.go.kr/eacnew/accessInspect.do';
 
 function ensureDataDir() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
